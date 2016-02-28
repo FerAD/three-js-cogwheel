@@ -1,0 +1,361 @@
+<html> 
+    <head> 
+        <title> Defining a 3D Shape </title> 
+        <style> 
+            canvas { width: 100%; height: 100% }
+        </style> 
+    </head> 
+    <body> 
+        <script src="three.min.js"> </script> 
+        
+        <script> 
+
+            window.addEventListener('keydown',doKeyDown,true);
+            // agregamos el "listener" para "escuchar" los eventos del teclado
+            
+
+            var zpos = 22.0;
+            var xpos = 0.0;
+            var ypos = 5.0;
+            var camRot = 0.0;
+            var PI = 3.1416; 
+            
+    		function doKeyDown(evt){
+                switch (evt.keyCode) {
+                    case 38:  /* Up arrow was pressed */     
+
+                        var dx = Math.sin(camRot)*0.2;
+                        var dz = Math.cos(camRot)*0.2;                  
+                        //zpos -= 0.3;
+                        xpos = xpos -dx;
+                        zpos = zpos -dz;
+                        break;
+                    case 40:  /* Down arrow was pressed */                        
+                        
+                        var dx = Math.sin(camRot)*0.2;
+                        var dz = Math.cos(camRot)*0.2;   
+                               
+                        //zpos -= 0.3;
+                        xpos = xpos +dx;
+                        zpos = zpos +dz;
+                        break;
+
+                    case 37:  /* Left arrow was pressed */
+                        camRot +=(1*PI/180);
+                        break;
+                        
+                    case 39:  /* Right arrow was pressed */   
+                         camRot -=(1*PI/180);
+                         break;
+
+                    case 87: /* W arrow was pressed */   
+                        ypos += 0.5;
+                        break;
+
+                    case 83: /* S arrow was pressed */   
+                        ypos -= 0.5;
+                        break;
+                    
+                    case 68: /* D arrow was pressed */ 
+                        
+                        var dz = 0.2*Math.cos(camRot+(90*PI/180.0));
+                        var dx = 0.2*Math.sin(camRot+(90*PI/180.0));
+                        
+                        zpos += dz;
+                        xpos += dx;
+                        break;
+                   
+                    case 65: /* A arrow was pressed */
+                        var dz = 0.2*Math.cos(camRot-(90*PI/180.0));
+                        var dx = 0.2*Math.sin(camRot-(90*PI/180.0));
+                        
+                        zpos += dz;
+                        xpos += dx;
+                        break;
+
+
+                    break;
+                }
+            }
+
+            // three basic components of a scene
+            var scene = new THREE.Scene(); 
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.01, 1000); 
+            var renderer = new THREE.WebGLRenderer(); 
+
+
+            // create a new geometry
+            var geom = new THREE.Geometry(); 
+			var numeroDeCirculos=3.0;
+			var numeroDeVertices=24.0;
+			var radio=5.0;
+			var i; //i y j solo sirven para los for
+			var j;
+			var zFront=1;
+			var zBack=0;
+			var angulo=360.0;
+			var radioPivote; // sirve para ir definiendo los radios más pequeños
+			var radioTemp;
+
+			//crea los vértices del frente 
+			radioPivote=radio/numeroDeCirculos;
+			
+			for(i=0; i < numeroDeCirculos; i++) //calcula los vértices para cada radio, es decir hasta el total de numeroDeCirculos
+			{
+				radioTemp=radioPivote+(radioPivote*i);
+				for(j=0; j < numeroDeVertices; j++) // calcula los vértices para cada ángulo, es decir, hasta el total de numero de vertices
+				{
+						
+					geom.vertices.push(new THREE.Vector3( radioTemp*Math.cos((j*(angulo/numeroDeVertices))*(Math.PI/180.0)),  radioTemp*Math.sin((j*(angulo/numeroDeVertices))*Math.PI/180.0) , zFront));   // index 0  
+						
+					//console.log(j + " i: " +i);
+					//var b = isNaN(Math.pi/180.0)
+					console.log(radioTemp);
+					//console.log(radioPivote*Math.cos(0));	
+						
+					//console.log(" i: " + " x: "  + radioPivote*Math.cos((j*(angulo/numeroDeVertices))*(Math.PI/180.0)) );
+					//console.log(" i: " + " y: "  + radioPivote*Math.sin((j*(angulo/numeroDeVertices))*Math.PI/180.0));
+					}
+				
+			}
+				
+			//crea los vértices de atrás
+			radioPivote=radio/numeroDeCirculos;
+			
+			for(i=0; i < numeroDeCirculos; i++) //calcula los vértices para cada radio, es decir hasta el total de numeroDeCirculos
+			{
+				radioTemp=radioPivote+(radioPivote*i);
+				for(j=0; j < numeroDeVertices; j++) // calcula los vértices para cada ángulo, es decir, hasta el total de numero de vertices
+				{
+						
+					geom.vertices.push(new THREE.Vector3( radioTemp*Math.cos((j*(angulo/numeroDeVertices))*(Math.PI/180.0)),  radioTemp*Math.sin((j*(angulo/numeroDeVertices))*Math.PI/180.0) , zBack));   // index 0  
+						
+					//console.log(j + " i: " +i);
+					//var b = isNaN(Math.pi/180.0)
+					console.log(radioTemp);
+					
+					}
+				
+			}
+			
+			//crea las caras de la tapa del frente
+			for(i=0; i < numeroDeCirculos-1; i++)
+			{
+				for(j=0; j < numeroDeVertices; j++) // calcula los vértices para cada ángulo, es decir, hasta el total de numero de vertices
+				{
+					if(i==numeroDeCirculos-2)//Es para que las últimas caras sean salteadas
+						j++;
+					if(j==numeroDeVertices-1)
+					{
+						geom.faces.push( new THREE.Face3( j+(numeroDeVertices*i), j+(numeroDeVertices*i)+numeroDeVertices, j+(numeroDeVertices*i)+1 ));     
+						geom.faces.push( new THREE.Face3( j+(numeroDeVertices*i), j+(numeroDeVertices*i)+1, numeroDeVertices*i )); 
+						
+					}
+					else
+					{
+						geom.faces.push( new THREE.Face3( j+(numeroDeVertices*i), j+(numeroDeVertices*i)+numeroDeVertices, j+(numeroDeVertices*i)+numeroDeVertices+1 ));     
+						geom.faces.push( new THREE.Face3( j+(numeroDeVertices*i), j+(numeroDeVertices*i)+numeroDeVertices+1, j+(numeroDeVertices*i)+1 )); 
+						
+					}		
+				
+				}
+			}
+			
+			//crea las caras de la tapa de atrás
+			for(i=0; i < numeroDeCirculos-1; i++)
+			{
+				for(j=0; j < numeroDeVertices; j++) 
+				{
+					if(i==numeroDeCirculos-2) //Es para que las últimas caras sean salteadas
+						j++;
+				
+					if(j==numeroDeVertices-1)
+					{
+						geom.faces.push( new THREE.Face3( j+(numeroDeVertices*i)+1 +(numeroDeCirculos*numeroDeVertices) , j+(numeroDeVertices*i)+numeroDeVertices +(numeroDeCirculos*numeroDeVertices), j+(numeroDeVertices*i)+(numeroDeCirculos*numeroDeVertices) ));     
+						geom.faces.push( new THREE.Face3( j+(numeroDeVertices*i)+1 +(numeroDeCirculos*numeroDeVertices), j+(numeroDeVertices*i)+(numeroDeCirculos*numeroDeVertices) , (numeroDeVertices*i) +(numeroDeCirculos*numeroDeVertices))); 
+						
+					}
+					else
+					{
+						geom.faces.push( new THREE.Face3( j+(numeroDeVertices*i)+numeroDeVertices+1 +(numeroDeCirculos*numeroDeVertices), j+(numeroDeVertices*i)+numeroDeVertices+(numeroDeCirculos*numeroDeVertices), j+(numeroDeVertices*i)+(numeroDeCirculos*numeroDeVertices)   ));     
+						
+						geom.faces.push( new THREE.Face3(  j+(numeroDeVertices*i)+numeroDeVertices+1 +(numeroDeCirculos*numeroDeVertices), j+(numeroDeVertices*i) +(numeroDeCirculos*numeroDeVertices), j+(numeroDeVertices*i)+1 +(numeroDeCirculos*numeroDeVertices) )); 
+					}		
+				
+				}
+			}
+			
+			//crea las caras frontales del interior del engrane
+			for(j=0; j < numeroDeVertices; j++) 
+			{	
+				if(j==numeroDeVertices-1)
+					{
+						geom.faces.push( new THREE.Face3( (numeroDeCirculos*numeroDeVertices) , j+(numeroDeCirculos*numeroDeVertices), j ));     
+						geom.faces.push( new THREE.Face3( (numeroDeCirculos*numeroDeVertices) , j , 0)); 
+						
+					}
+					else
+					{
+						geom.faces.push( new THREE.Face3( j+1 +(numeroDeCirculos*numeroDeVertices), j+(numeroDeCirculos*numeroDeVertices), j ));     
+						
+						geom.faces.push( new THREE.Face3(  j+1 +(numeroDeCirculos*numeroDeVertices), j , j +1  )); 
+					}	
+			}
+			
+			//crea las caras frontales de afuera 
+			for(j=0; j < numeroDeVertices; j++) 
+			{	
+				if( (j%2)!=0 )
+				{	if(j==numeroDeVertices-1)
+					{		
+						//frontales
+						geom.faces.push( new THREE.Face3( j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices) , 
+						numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices), numeroDeVertices*(numeroDeCirculos-1)  ));
+				
+						geom.faces.push( new THREE.Face3( j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices) , 
+						numeroDeVertices*(numeroDeCirculos-1), numeroDeVertices*numeroDeCirculos-1  ));
+						
+						//laterales
+						geom.faces.push( new THREE.Face3(j+numeroDeVertices+(numeroDeCirculos*numeroDeVertices) , 
+						j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices), j+numeroDeVertices*(numeroDeCirculos-1) ));
+					
+						geom.faces.push( new THREE.Face3( j+numeroDeVertices+(numeroDeCirculos*numeroDeVertices), 
+						j+numeroDeVertices*(numeroDeCirculos-1), j+numeroDeVertices ));
+					
+					}
+					else
+					{
+						//frontales
+						geom.faces.push( new THREE.Face3( j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices) , 
+						j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices)+1, j+numeroDeVertices*(numeroDeCirculos-1)+1  ));
+				
+						geom.faces.push( new THREE.Face3( j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices) , 
+						j+numeroDeVertices*(numeroDeCirculos-1)+1, j+numeroDeVertices*(numeroDeCirculos-1)  ));
+						
+						
+						//laterales
+						geom.faces.push( new THREE.Face3(j+numeroDeVertices+(numeroDeCirculos*numeroDeVertices) , 
+						j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices), j+numeroDeVertices*(numeroDeCirculos-1) ));
+					
+						geom.faces.push( new THREE.Face3( j+numeroDeVertices+(numeroDeCirculos*numeroDeVertices), 
+						j+numeroDeVertices*(numeroDeCirculos-1), j+numeroDeVertices ));
+					}
+				}
+				else
+				{
+					//frontales
+					geom.faces.push( new THREE.Face3(j+numeroDeVertices+(numeroDeCirculos*numeroDeVertices) , 
+						j+numeroDeVertices+(numeroDeCirculos*numeroDeVertices)+1, j+numeroDeVertices +1  ));
+					
+					geom.faces.push( new THREE.Face3( j+numeroDeVertices+(numeroDeCirculos*numeroDeVertices), 
+						j+numeroDeVertices +1 , j+numeroDeVertices  ));
+						
+					//laterales	
+					geom.faces.push( new THREE.Face3(j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices) , 
+					j+numeroDeVertices+(numeroDeCirculos*numeroDeVertices), j+numeroDeVertices ));
+					
+					geom.faces.push( new THREE.Face3( j+numeroDeVertices*(numeroDeCirculos-1)+(numeroDeCirculos*numeroDeVertices), 
+					j+numeroDeVertices , j+numeroDeVertices*(numeroDeCirculos-1) ));
+				}
+	
+			}
+			
+			
+            geom.computeFaceNormals();
+
+
+            // create a Lambert material
+            var LambertMaterial = new THREE.MeshLambertMaterial(
+                        {
+                            color: 0xEEEEEE
+                        });
+
+            // create a wireframe material
+            //var meshMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+
+            var object = new THREE.Mesh( geom, LambertMaterial);
+            //var object = new THREE.Mesh( geom, meshMaterial);
+
+            group = new THREE.Object3D();           // create an empty container
+            group.add( object );                    // add a mesh with geometry to it
+
+            scene.add( group );                     // add the group to the scene                  
+            
+            renderer.setSize(window.innerWidth, window.innerHeight); 
+            document.body.appendChild(renderer.domElement); 
+
+            //camera.position.z = cam_zpos; 
+
+            // create some point lights
+            var pointLight1 = new THREE.PointLight( 0xFFFFFF );
+            var pointLight2 = new THREE.PointLight( 0xFFFFFF );
+			var pointLight3 = new THREE.PointLight( 0xFFFFFF );
+			var pointLight4 = new THREE.PointLight( 0xFFFFFF );
+			var pointLight5 = new THREE.PointLight( 0xFFFFFF );
+			var pointLight6 = new THREE.PointLight( 0xFFFFFF );
+
+            // set its position
+            pointLight1.position.x = 0;
+            pointLight1.position.y = 0;
+            pointLight1.position.z = 40;
+
+            // add to the scene
+            scene.add(pointLight1);
+            
+            // set its position
+            pointLight2.position.x = 0;
+            pointLight2.position.y = 0;
+            pointLight2.position.z = -40;
+
+            // add to the scene
+            scene.add(pointLight2);
+			
+			 // set its position
+            pointLight3.position.x = -40;
+            pointLight3.position.y = 0;
+            pointLight3.position.z = 0.5;
+
+            // add to the scene
+            scene.add(pointLight3);
+			
+			 // set its position
+            pointLight4.position.x = 40;
+            pointLight4.position.y = 0;
+            pointLight4.position.z = 0.5;
+
+            // add to the scene
+            scene.add(pointLight4);
+			
+			 // set its position
+            pointLight5.position.x = 0;
+            pointLight5.position.y = -40;
+            pointLight5.position.z = 0.5;
+
+            // add to the scene
+            scene.add(pointLight5);
+			
+			 // set its position
+            pointLight4.position.x = 0;
+            pointLight4.position.y = 40;
+            pointLight4.position.z = 0.5;
+
+            // add to the scene
+            scene.add(pointLight4);
+            
+            // set the background color
+            renderer.setClearColor(0x000022, 1);
+
+            var render = function () { 
+                requestAnimationFrame(render);
+                group.rotation.z += .005;
+                camera.position.z = zpos; 
+                camera.position.x = xpos; 
+                camera.rotation.y = camRot;
+                camera.position.y = ypos;
+                renderer.render(scene, camera); 
+            }; 
+
+            render();             
+        </script> 
+    </body> 
+</html>

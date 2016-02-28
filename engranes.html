@@ -1,0 +1,417 @@
+<!--
+Karen Abarca Garcia A01323627
+Fernando Arey Duran A00397411
+-->
+<html>
+    <head>
+        <title>.::Engrane::.</title>
+        <style> 
+            canvas { width: 100%; height: 100% }
+        </style> 
+    </head>
+    <body>
+        <script src="three.min.js"> </script>
+         <script> 
+
+            window.addEventListener('keydown',doKeyDown,true);
+
+
+            //POSICIONES INICIALES
+            var zPos = 30.0;
+            var xPos = 0.0;
+            var ypos = 5.0;
+            var camRotation = 0;
+
+
+            /*FUNCION QUE COMTROLA LOS MOVIMIENTOS DE LA ESCENA*/
+            function doKeyDown(evt){
+
+                switch (evt.keyCode) {
+                    case 38:  /* Up arrow was pressed */         
+                        var dx = 0.5 * Math.sin(camRotation); 
+                        var dz = 0.5 * Math.cos(camRotation); 
+                        zPos -= dz;
+                        xPos -= dx;
+                        break;
+                    case 40:  /* Down arrow was pressed */                        
+                        var dx = 0.5 * Math.sin(camRotation); 
+                        var dz = 0.5 * Math.cos(camRotation); 
+                        zPos += dz;
+                        xPos += dx;
+                        break;
+                    case 37:  /* Left arrow was pressed */                        
+                        camRotation += (5 * Math.PI) / 180;
+                        break;
+                    case 39:  /* Right arrow was pressed */                        
+                        camRotation -= (5 * Math.PI) / 180;
+                        break;
+
+
+                    case 87:  /* W was pressed */
+                        camera.position.y += 0.5;                        
+                        break;
+                    case 83:  /* S was pressed */
+                        camera.position.y -= 0.5;                        
+                        break;
+                    case 65:  /* A was pressed */                        
+                        var dx = 0.5 * Math.sin(camRotation + Math.PI / 2 ); 
+                        var dz = 0.5 * Math.cos(camRotation + Math.PI / 2 ); 
+                        zPos -= dz;
+                        xPos -= dx;
+                        break;
+                    case 68:  /* D was pressed */
+                        var dx = 0.5 * Math.sin(camRotation - Math.PI / 2); 
+                        var dz = 0.5 * Math.cos(camRotation- Math.PI / 2); 
+                        zPos -= dz;
+                        xPos -= dx;                   
+                        break;
+
+                }//Fin switch
+
+            }//Fin funcion 
+           
+           
+            //creo la escena 
+            var scene = new THREE.Scene(); 
+            //creo la camara
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); 
+            //creo el render 
+            var renderer = new THREE.WebGLRenderer(); //creo el render
+            //tamaño del render
+            renderer.setSize(window.innerWidth, window.innerHeight); 
+            //envio el render al html
+            document.body.appendChild(renderer.domElement); 
+            
+            //creo la geometria engrane
+            var engrane = new THREE.Geometry();
+            //radio de las circunferencias del engrane
+            var radioCircunferenciaInterna = 2;
+            var radioCircunferenciaMedia = 2.5;
+            var radioCircunferenciaExterna = 2;
+            //numero de circulos por engrane
+            var numCirculos = 3.0;
+            //numero de vertices por circulo del engrane
+            var numVertices = 62.0;
+            var angulo = 360;
+
+            
+            //obtenemos los vertices para cada circunferencia del engrane cara frontal
+            for(i = 0; i<numCirculos; i++){
+                switch(i){  
+                    case 0:     //circunferencia interna
+                        radioTemp = radioCircunferenciaInterna+(radioCircunferenciaInterna*i);    
+                        for(j = 0; j < numVertices; j++){   //para cada vertice saco x,y,z
+                            x =  radioTemp*Math.cos((j*(angulo/numVertices))*(Math.PI/180.0));
+                            y = radioTemp*Math.sin((j*(angulo/numVertices))*Math.PI/180.0);
+                            z = 2;
+                            //creamos el vector
+                            var vector = new THREE.Vector3(x,y,z);
+                            //agregamos los vecotres a la geometria
+                            engrane.vertices.push(vector);
+                            
+                        }
+                        break;
+                    case 1:     //circunferencia media
+                        radioTemp = radioCircunferenciaMedia+(radioCircunferenciaMedia*i);
+                        for(j = 0; j < numVertices; j++){   //para cada vertice saco x,y,z
+                            x =  radioTemp*Math.cos((j*(angulo/numVertices))*(Math.PI/180.0));
+                            y = radioTemp*Math.sin((j*(angulo/numVertices))*Math.PI/180.0);
+                            z = 2;
+                            //creamos el vector
+                            var vector = new THREE.Vector3(x,y,z);
+                            //agregamos los vecotres a la geometria
+                            engrane.vertices.push(vector);
+                            
+                        }
+                        break;
+                    case 2:     //circunferencia externa
+                        radioTemp = radioCircunferenciaExterna+(radioCircunferenciaExterna*i);
+                        for(j = 0; j < numVertices; j++){   //para cada vertice saco x,y,z
+                            x =  radioTemp*Math.cos((j*(angulo/numVertices))*(Math.PI/180.0));
+                            y = radioTemp*Math.sin((j*(angulo/numVertices))*(Math.PI/180.0));
+                            z = 2;
+                            //creamos el vector
+                            var vector = new THREE.Vector3(x,y,z);
+                            //agregamos los vecotres a la geometria
+                            engrane.vertices.push(vector);
+                            
+                        }
+                        break;
+                }
+                
+            }
+
+            //obtengo los vertices para cada circunferencia del engrane cara tracera
+            for(i = 0; i<numCirculos; i++){
+                switch(i){
+                    case 0:     //circunferencia interna
+                        radioTemp = radioCircunferenciaInterna+(radioCircunferenciaInterna*i);
+                        for(j = 0; j < numVertices; j++){   //para cada vertice saco su x,y,z
+                            x =  radioTemp*Math.cos((j*(angulo/numVertices))*(Math.PI/180.0));
+                            y = radioTemp*Math.sin((j*(angulo/numVertices))*Math.PI/180.0);
+                            z = 0;
+                            //creamos el vector
+                            var vector = new THREE.Vector3(x,y,z);
+                            //agregamos los vecotres a la geometria
+                            engrane.vertices.push(vector);
+                            
+                        }
+                        break;
+                    case 1:     //circunferencia media
+                        radioTemp = radioCircunferenciaMedia+(radioCircunferenciaMedia*i);
+                        for(j = 0; j < numVertices; j++){   //para cada vertice saco su x,y,z
+                            x =  radioTemp*Math.cos((j*(angulo/numVertices))*(Math.PI/180.0));
+                            y = radioTemp*Math.sin((j*(angulo/numVertices))*Math.PI/180.0);
+                            z = 0;
+                            //creamos el vector
+                            var vector = new THREE.Vector3(x,y,z);
+                            //agregamos los vecotres a la geometria
+                            engrane.vertices.push(vector);
+                            
+                        }
+                        break;
+                    case 2:     //circunferencia externa
+                        radioTemp = radioCircunferenciaExterna+(radioCircunferenciaExterna*i);
+                        for(j = 0; j < numVertices; j++){   //para cada vertice saco su x,y,z
+                            x =  radioTemp*Math.cos((j*(angulo/numVertices))*(Math.PI/180.0));
+                            y = radioTemp*Math.sin((j*(angulo/numVertices))*Math.PI/180.0);
+                            z = 0;
+                            //creamos el vector
+                            var vector = new THREE.Vector3(x,y,z);
+                            //agregamos los vecotres a la geometria
+                            engrane.vertices.push(vector);
+                            
+                        }
+                        break;
+                }
+                
+            }
+            //caras del frente
+            for(i=0; i < numCirculos-1; i++)
+            {
+                for(j=0; j < numVertices; j++) // obtenemos todos los vertices
+                {
+                    if(i==numCirculos-2)    //caras de los dientes
+                        j++;
+                    if(j==numVertices-1)    //si es la ultima cara pinta tomando el primer vertice y el ultimo para hacer las dos caras
+                    {
+                        engrane.faces.push( new THREE.Face3( j+(numVertices*i), j+(numVertices*i)+numVertices, j+(numVertices*i)+1 ));     
+                        engrane.faces.push( new THREE.Face3( j+(numVertices*i), j+(numVertices*i)+1, numVertices*i )); 
+                        
+                    }
+                    else   
+                    {
+                        engrane.faces.push( new THREE.Face3( j+(numVertices*i), j+(numVertices*i)+numVertices, j+(numVertices*i)+numVertices+1 ));     
+                        engrane.faces.push( new THREE.Face3( j+(numVertices*i), j+(numVertices*i)+numVertices+1, j+(numVertices*i)+1 )); 
+                        
+                    }       
+                
+                }
+            }
+            //caras atras
+            for(i=0; i < numCirculos-1; i++)
+            {
+                for(j=0; j < numVertices; j++) 
+                {
+                    if(i==numCirculos-2) //cara de los dientes
+                        j++;
+                
+                    if(j==numVertices-1)    //si es la ultima cara toma los vertices primeros y ultimos para hacer la cara
+                    {
+                        engrane.faces.push( new THREE.Face3( j+(numVertices*i)+1 +(numCirculos*numVertices) , j+(numVertices*i)+numVertices +(numCirculos*numVertices), j+(numVertices*i)+(numCirculos*numVertices) ));     
+                        engrane.faces.push( new THREE.Face3( j+(numVertices*i)+1 +(numCirculos*numVertices), j+(numVertices*i)+(numCirculos*numVertices) , (numVertices*i) +(numCirculos*numVertices))); 
+                        
+                    }
+                    else
+                    {
+                        engrane.faces.push( new THREE.Face3( j+(numVertices*i)+numVertices+1 +(numCirculos*numVertices), j+(numVertices*i)+numVertices+(numCirculos*numVertices), j+(numVertices*i)+(numCirculos*numVertices)   ));     
+                        
+                        engrane.faces.push( new THREE.Face3(  j+(numVertices*i)+numVertices+1 +(numCirculos*numVertices), j+(numVertices*i) +(numCirculos*numVertices), j+(numVertices*i)+1 +(numCirculos*numVertices) )); 
+                    }       
+                
+                }
+            }
+
+            //crea las caras frontales del interior del engrane
+            for(j=0; j < numVertices; j++) 
+            {   
+                if(j==numVertices-1)    //si es el ultimo vertice
+                    {
+                        engrane.faces.push( new THREE.Face3( (numCirculos*numVertices) , j+(numCirculos*numVertices), j ));     
+                        engrane.faces.push( new THREE.Face3( (numCirculos*numVertices) , j , 0)); 
+                        
+                    }
+                    else
+                    {
+                        engrane.faces.push( new THREE.Face3( j+1 +(numCirculos*numVertices), j+(numCirculos*numVertices), j ));     
+                        
+                        engrane.faces.push( new THREE.Face3(  j+1 +(numCirculos*numVertices), j , j +1  )); 
+                    }   
+            }
+            
+            //crea las caras frontales de afuera 
+            for(j=0; j < numVertices; j++) 
+            {   
+                if( (j%2)!=0 )  //es el diente
+                {   if(j==numVertices-1)    //si es el ultimo vertice
+                    {       
+                        //cara superior
+                        engrane.faces.push( new THREE.Face3( j+numVertices*(numCirculos-1)+(numCirculos*numVertices) , 
+                        numVertices*(numCirculos-1)+(numCirculos*numVertices), numVertices*(numCirculos-1)  ));
+                
+                        engrane.faces.push( new THREE.Face3( j+numVertices*(numCirculos-1)+(numCirculos*numVertices) , 
+                        numVertices*(numCirculos-1), numVertices*numCirculos-1  ));
+                        
+                        //lateral de los dientes
+                        engrane.faces.push( new THREE.Face3(j+numVertices+(numCirculos*numVertices) , 
+                        j+numVertices*(numCirculos-1)+(numCirculos*numVertices), j+numVertices*(numCirculos-1) ));
+                    
+                        engrane.faces.push( new THREE.Face3( j+numVertices+(numCirculos*numVertices), 
+                        j+numVertices*(numCirculos-1), j+numVertices ));
+                    
+                    }
+                    else
+                    {
+                        //superior
+                        engrane.faces.push( new THREE.Face3( j+numVertices*(numCirculos-1)+(numCirculos*numVertices) , 
+                        j+numVertices*(numCirculos-1)+(numCirculos*numVertices)+1, j+numVertices*(numCirculos-1)+1  ));
+                
+                        engrane.faces.push( new THREE.Face3( j+numVertices*(numCirculos-1)+(numCirculos*numVertices) , 
+                        j+numVertices*(numCirculos-1)+1, j+numVertices*(numCirculos-1)  ));
+                        
+                        
+                        //lateral de los dientes
+                        engrane.faces.push( new THREE.Face3(j+numVertices+(numCirculos*numVertices) , 
+                        j+numVertices*(numCirculos-1)+(numCirculos*numVertices), j+numVertices*(numCirculos-1) ));
+                    
+                        engrane.faces.push( new THREE.Face3( j+numVertices+(numCirculos*numVertices), 
+                        j+numVertices*(numCirculos-1), j+numVertices ));
+                    }
+                }
+                else    //es la parte donde no esta el diente
+                {
+                    //frontales
+                    engrane.faces.push( new THREE.Face3(j+numVertices+(numCirculos*numVertices) , 
+                        j+numVertices+(numCirculos*numVertices)+1, j+numVertices +1  ));
+                    
+                    engrane.faces.push( new THREE.Face3( j+numVertices+(numCirculos*numVertices), 
+                        j+numVertices +1 , j+numVertices  ));
+                        
+                    //laterales 
+                    engrane.faces.push( new THREE.Face3(j+numVertices*(numCirculos-1)+(numCirculos*numVertices) , 
+                    j+numVertices+(numCirculos*numVertices), j+numVertices ));
+                    
+                    engrane.faces.push( new THREE.Face3( j+numVertices*(numCirculos-1)+(numCirculos*numVertices), 
+                    j+numVertices , j+numVertices*(numCirculos-1) ));
+                }
+    
+            }
+            
+            
+            engrane.computeFaceNormals();
+            
+            
+            //creamos la materia para que la figura tenga color rojo
+            var material = new THREE.MeshLambertMaterial(
+                        {
+                            color: 0xDC1616
+                        });
+            var figura = new THREE.Mesh(engrane,material);
+            
+            group = new THREE.Object3D();           // grupo del primer engrane
+            group.add( figura );                    // agrego la figura al grupo
+            scene.add( group );                     // agrego el grupo a la escena
+
+            // creamos el material del segundo engrane color verde
+            var material = new THREE.MeshLambertMaterial(   
+                        {
+                            color: 0x00994C
+                        });
+            figura = new THREE.Mesh(engrane,material);
+
+            group2 = new THREE.Object3D();  //grupo del segundo engrane
+            group2.add( figura );           //agrego la figura al grupo
+            scene.add( group2 );            //agrego el gurpo a la escena
+            
+            // creamos el material del tercer engrane color azul
+            var material = new THREE.MeshLambertMaterial(   
+                        {
+                            color: 0x0000CC
+                        });
+            figura = new THREE.Mesh(engrane,material);
+
+            group3 = new THREE.Object3D();  //grupo del segundo engrane
+            group3.add( figura );           //agrego la figura al grupo
+            scene.add( group3 );            //agrego el gurpo a la escena
+            
+
+             // creacion de luz
+            var luz1 = new THREE.PointLight( 0xFFFFFF );
+            var luz2 = new THREE.PointLight( 0xFFFFFF );
+            var luz3 = new THREE.PointLight( 0xFFFFFF );
+            var luz4 = new THREE.PointLight( 0xFFFFFF );
+            
+            
+
+            // set its position
+            luz1.position.x = 0;
+            luz1.position.y = 0;
+            luz1.position.z = 40;
+
+            // add to the scene
+            scene.add(luz1);
+            
+            // set its position
+            luz2.position.x = 0;
+            luz2.position.y = 0;
+            luz2.position.z = -40;
+
+            // add to the scene
+            scene.add(luz2);
+            
+             // set its position
+            luz3.position.x = -40;
+            luz3.position.y = 0;
+            luz3.position.z = 0.5;
+
+            // add to the scene
+            scene.add(luz3);
+            
+             // set its position
+            luz4.position.x = 40;
+            luz4.position.y = 0;
+            luz4.position.z = 0.5;
+
+            // add to the scene
+            scene.add(luz4);
+            
+            
+            
+                
+            //color del fondo
+            renderer.setClearColor(0x000022, 1);
+            var render = function () { //creo la variable render y le asigno una funcion 
+                requestAnimationFrame(render);  // pido el render
+                //posicion de los engranes
+                group.rotation.z += .005;   
+                group.position.x = -10;
+                group.position.y = -10
+                
+                group2.rotation.z -=.005;
+                group2.position.x = .99;
+                group2.position.y = -10;
+
+                group3.rotation.z -=.005;
+                group3.position.x = -10;
+                group3.position.y = .95;
+
+                camera.position.z = zPos;
+                camera.position.x = xPos; 
+                camera.rotation.y = camRotation;
+                renderer.render(scene, camera);     //actualiza la escena y camara
+            }; 
+            render();     
+            
+        </script> 
+    </body>
+</html>
